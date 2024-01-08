@@ -8,12 +8,12 @@ let spreadsheetId = null;
 
 async function initializeGoogleSheetsApi() {
   auth = new google.auth.GoogleAuth({
-    keyFile: "secrets.json",
+    keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS,
     scopes: "https://www.googleapis.com/auth/spreadsheets",
   });
   client = await auth.getClient();
   googleSheets = google.sheets({ version: "v4", auth: client });
-  spreadsheetId = "15_7naupbzklWJp4yCvSESVoZ3zmQfirUXuRZ_r91HiM";
+  spreadsheetId = process.env.SHEET_ID;
 }
 
 async function getCurRowNumber() {
