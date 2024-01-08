@@ -26,6 +26,11 @@ async function getCurRowNumber() {
 }
 
 export async function setName(formData) {
+  let data = formData;
+  delete data.emailVerified;
+  delete data.numberVerified;
+  delete data.referralVerified;
+  delete data.college_mailVerified;
   await initializeGoogleSheetsApi();
   await googleSheets.spreadsheets.values.append({
     auth,
@@ -33,21 +38,26 @@ export async function setName(formData) {
     range: "Sheet1!A:K",
     valueInputOption: "USER_ENTERED",
     resource: {
-      values: [Object.values(formData)],
+      values: [Object.values(data)],
     },
   });
   return getCurRowNumber();
 }
 
 export async function updateCurData(formData, curRowNumber) {
+  let data = formData;
+  delete data.emailVerified;
+  delete data.numberVerified;
+  delete data.referralVerified;
+  delete data.college_mailVerified;
   if (curRowNumber === 0) return;
   await googleSheets.spreadsheets.values.update({
     auth,
     spreadsheetId,
-    range: `Sheet1!A${curRowNumber}:K${curRowNumber}`,
+    range: `Sheet1!A${curRowNumber}:G${curRowNumber}`,
     valueInputOption: "USER_ENTERED",
     resource: {
-      values: [Object.values(formData)],
+      values: [Object.values(data)],
     },
   });
 }

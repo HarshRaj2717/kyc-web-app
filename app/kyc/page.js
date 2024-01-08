@@ -55,7 +55,7 @@ function FormControl({
             }}
           >
             {!verificationStatus && "Verify"}
-            {verificationStatus && "Verified ✅"}
+            {verificationStatus && "Verification Link Sent ✅"}
           </div>
         )}
       </div>
@@ -75,26 +75,29 @@ export default function KYC() {
     number: "",
     numberVerified: false,
     referral: "",
-    referralVerified: false,
+    // referralVerified: false,
     college: "",
     college_mail: "",
     college_mailVerified: false,
     college_id: "",
   });
 
-  function handleVerify(name, verificationFun) {
-    if (verificationFun(formData[name])) {
-      const updatedData = {
-        ...formData,
-        [`${name}Verified`]: true,
-      };
-      setFormData(updatedData);
-      handleAutoSubmit(updatedData);
-    }
-  }
+  // function handleVerify(name, verificationFun) {
+  //   if (verificationFun(formData[name], curRowNumber)) {
+  //     const updatedData = {
+  //       ...formData,
+  //       [`${name}Verified`]: true,
+  //     };
+  //     setFormData(updatedData);
+  //     handleAutoSubmit(updatedData);
+  //   }
+  // }
 
   const handleSubmit = async () => {
     await sheet.updateCurData(formData, curRowNumber);
+    await verifiers.whatsappVerifier(formData.number);
+    await verifiers.mailVerifier(formData.email);
+    await verifiers.collegeMailVerifier(formData.college_mail);
   };
 
   const handleAutoSubmit = async (updatedData = null) => {
@@ -181,11 +184,11 @@ export default function KYC() {
                 formData={formData}
                 handleChange={handleChange}
                 handleBlur={handleBlur}
-                verificationNeeded={true}
-                handleVerify={(name) => {
-                  handleVerify(name, verifiers.mailVerifier);
-                }}
-                verificationStatus={formData.emailVerified}
+                // verificationNeeded={true}
+                // handleVerify={(name) => {
+                //   handleVerify(name, verifiers.mailVerifier);
+                // }}
+                // verificationStatus={formData.emailVerified}
               />
 
               {/* Number */}
@@ -197,11 +200,11 @@ export default function KYC() {
                 formData={formData}
                 handleChange={handleChange}
                 handleBlur={handleBlur}
-                verificationNeeded={true}
-                handleVerify={(name) => {
-                  handleVerify(name, verifiers.whatsappVerifier);
-                }}
-                verificationStatus={formData.numberVerified}
+                // verificationNeeded={true}
+                // handleVerify={(name) => {
+                //   handleVerify(name, verifiers.whatsappVerifier);
+                // }}
+                // verificationStatus={formData.numberVerified}
               />
 
               {/* referral code */}
@@ -214,11 +217,11 @@ export default function KYC() {
                 handleChange={handleChange}
                 handleBlur={handleBlur}
                 isRequired={false}
-                verificationNeeded={true}
-                handleVerify={(name) => {
-                  handleVerify(name, verifiers.referralVerifier);
-                }}
-                verificationStatus={formData.referralVerified}
+                // verificationNeeded={true}
+                // handleVerify={(name) => {
+                //   handleVerify(name, verifiers.referralVerifier);
+                // }}
+                // verificationStatus={formData.referralVerified}
               />
 
               {/* College name */}
@@ -240,12 +243,12 @@ export default function KYC() {
                 name={"college_mail"}
                 formData={formData}
                 handleChange={handleChange}
-                verificationNeeded={true}
-                handleVerify={(name) => {
-                  handleVerify(name, verifiers.mailVerifier);
-                }}
-                verificationStatus={formData.college_mailVerified}
                 handleBlur={handleBlur}
+                // verificationNeeded={true}
+                // handleVerify={(name) => {
+                //   handleVerify(name, verifiers.collegeMailVerifier);
+                // }}
+                // verificationStatus={formData.college_mailVerified}
               />
 
               {/* College id */}
