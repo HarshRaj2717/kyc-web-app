@@ -1,31 +1,60 @@
 "use client";
 import React, { useState } from "react";
+import * as verifiers from "./verifiers";
 
 function FormControl({
   labelText,
   type,
   placeholder,
   name,
-  value,
+  formData,
   handleChange,
   handleBlur,
+  verificationNeeded = false,
+  handleVerify,
+  verificationStatus = false,
 }) {
   return (
     <div className="form-control">
       <label className="label">
         <span className="label-text">{labelText}</span>
       </label>
-      <input
-        id={name}
-        type={type}
-        className="input input-bordered"
-        placeholder={placeholder}
-        name={name}
-        value={value}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        required
-      />
+      <div className="flex">
+        <input
+          id={name}
+          type={type}
+          className={
+            "input input-bordered flex-grow" +
+            " " +
+            (verificationStatus && "input-disabled")
+          }
+          placeholder={placeholder}
+          name={name}
+          value={formData[name]}
+          onChange={(e) => {
+            verificationStatus ? null : handleChange(e);
+          }}
+          onBlur={(e) => {
+            verificationStatus ? null : handleBlur ? handleBlur(e) : null;
+          }}
+          required
+        />
+        {verificationNeeded && (
+          <div
+            className={
+              "btn btn-warning ml-2" +
+              " " +
+              (verificationStatus && "btn-disabled")
+            }
+            onClick={(e) => {
+              handleVerify(name);
+            }}
+          >
+            {!verificationStatus && "Verify"}
+            {verificationStatus && "Verified ✅"}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -36,16 +65,37 @@ export default function KYC() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    emailVerified: false,
     number: "",
+    numberVerified: false,
     referral: "",
+    referralVerified: false,
     college: "",
     college_mail: "",
+    college_mailVerified: false,
     college_id: "",
   });
 
-  const handleSubmit = (submitBtnClicked = false) => {
+  function handleVerify(name, verificationFun) {
+    if (verificationFun(formData[name])) {
+      const updatedData = {
+        ...formData,
+        [`${name}Verified`]: true,
+      };
+      setFormData(updatedData);
+      handleAutoSubmit(updatedData);
+    }
+  }
+
+  const handleSubmit = () => {
     // Handle form submission (e.g., send data to a server, store it, etc.)
     console.log("Form Data:", formData);
+  };
+
+  const handleAutoSubmit = (updatedData = null) => {
+    // Handle form submission (e.g., send data to a server, store it, etc.)
+    const data = updatedData || formData;
+    console.log("Form Data:", data);
   };
 
   const handleNameSubmit = (e) => {
@@ -65,7 +115,7 @@ export default function KYC() {
 
   const handleBlur = () => {
     // Automatically submit the form when the user moves from "name" to "email" input
-    handleSubmit();
+    handleAutoSubmit();
   };
 
   return (
@@ -89,7 +139,7 @@ export default function KYC() {
                 type={"text"}
                 placeholder={"name"}
                 name={"name"}
-                value={formData.name}
+                formData={formData}
                 handleChange={handleChange}
               />
 
@@ -112,20 +162,30 @@ export default function KYC() {
                 type={"email"}
                 placeholder={"email@example.com"}
                 name={"email"}
-                value={formData.email}
+                formData={formData}
                 handleChange={handleChange}
                 handleBlur={handleBlur}
+                verificationNeeded={true}
+                handleVerify={(name) => {
+                  handleVerify(name, verifiers.mailVerifier);
+                }}
+                verificationStatus={formData.emailVerified}
               />
 
-              {/* Whatsapp Number */}
+              {/* Number */}
               <FormControl
                 labelText={"Whatsapp Number"}
                 type={"text"}
                 placeholder={"(+91) __________"}
                 name={"number"}
-                value={formData.number}
+                formData={formData}
                 handleChange={handleChange}
                 handleBlur={handleBlur}
+                verificationNeeded={true}
+                handleVerify={(name) => {
+                  handleVerify(name, verifiers.whatsappVerifier);
+                }}
+                verificationStatus={formData.numberVerified}
               />
 
               {/* referral code */}
@@ -134,9 +194,14 @@ export default function KYC() {
                 type={"text"}
                 placeholder={"XXXXXX"}
                 name={"referral"}
-                value={formData.referral}
+                formData={formData}
                 handleChange={handleChange}
                 handleBlur={handleBlur}
+                verificationNeeded={true}
+                handleVerify={(name) => {
+                  handleVerify(name, verifiers.referralVerifier);
+                }}
+                verificationStatus={formData.referralVerified}
               />
 
               {/* College name */}
@@ -145,7 +210,7 @@ export default function KYC() {
                 type={"text"}
                 placeholder={"college"}
                 name={"college"}
-                value={formData.college}
+                formData={formData}
                 handleChange={handleChange}
                 handleBlur={handleBlur}
               />
@@ -156,8 +221,13 @@ export default function KYC() {
                 type={"email"}
                 placeholder={"college email"}
                 name={"college_mail"}
-                value={formData.college_mail}
+                formData={formData}
                 handleChange={handleChange}
+                verificationNeeded={true}
+                handleVerify={(name) => {
+                  handleVerify(name, verifiers.mailVerifier);
+                }}
+                verificationStatus={formData.college_mailVerified}
                 handleBlur={handleBlur}
               />
 
@@ -167,17 +237,14 @@ export default function KYC() {
                 type={"text"}
                 placeholder={"college ID"}
                 name={"college_id"}
-                value={formData.college_id}
+                formData={formData}
                 handleChange={handleChange}
                 handleBlur={handleBlur}
               />
 
               {/* submit button */}
               <div className="form-control mt-6">
-                <button
-                  className="btn btn-primary"
-                  onClick={() => handleSubmit(true)}
-                >
+                <button className="btn btn-primary" onClick={handleSubmit}>
                   Submit
                 </button>
               </div>
