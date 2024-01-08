@@ -1,6 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as verifiers from "./verifiers";
+import * as sheet from "./sheet";
 
 function FormControl({
   labelText,
@@ -64,6 +65,8 @@ function FormControl({
 
 export default function KYC() {
   const [nameSubmitted, setNameSubmitted] = useState(false);
+  const [curRowNumber, setCurRowNumber] = useState(0);
+  const [nameBtnLoading, setNameBtnLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -90,23 +93,26 @@ export default function KYC() {
     }
   }
 
-  const handleSubmit = () => {
-    // Handle form submission (e.g., send data to a server, store it, etc.)
-    console.log("Form Data:", formData);
+  const handleSubmit = async () => {
+    await sheet.updateCurData(formData, curRowNumber);
   };
 
-  const handleAutoSubmit = (updatedData = null) => {
-    // Handle form submission (e.g., send data to a server, store it, etc.)
+  const handleAutoSubmit = async (updatedData = null) => {
     const data = updatedData || formData;
-    console.log("Form Data:", data);
+    await sheet.updateCurData(data, curRowNumber);
   };
 
-  const handleNameSubmit = (e) => {
-    if (formData.name.trim() === "") return;
+  const handleNameSubmit = async (e) => {
     e.preventDefault();
-    setNameSubmitted(true);
-    console.log(formData);
+    if (formData.name.trim() === "") return;
+    setNameBtnLoading(true);
+    const tempRowNumber = await sheet.setName(formData);
+    setCurRowNumber(tempRowNumber);
   };
+
+  useEffect(() => {
+    if (curRowNumber != 0) setNameSubmitted(true);
+  }, [curRowNumber]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -149,9 +155,16 @@ export default function KYC() {
               {/* submit button */}
               <div className="form-control mt-6">
                 <button
-                  className="btn btn-primary"
+                  className={
+                    "btn btn-primary" +
+                    " " +
+                    (nameBtnLoading ? "btn-disabled" : "")
+                  }
                   onClick={(e) => handleNameSubmit(e)}
                 >
+                  {nameBtnLoading && (
+                    <span className="loading loading-spinner"></span>
+                  )}
                   Submit
                 </button>
               </div>
