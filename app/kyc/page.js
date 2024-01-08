@@ -10,6 +10,7 @@ function FormControl({
   formData,
   handleChange,
   handleBlur,
+  isRequired = true,
   verificationNeeded = false,
   handleVerify,
   verificationStatus = false,
@@ -17,7 +18,9 @@ function FormControl({
   return (
     <div className="form-control">
       <label className="label">
-        <span className="label-text">{labelText}</span>
+        <span className="label-text">
+          {labelText + (isRequired ? " *" : "")}
+        </span>
       </label>
       <div className="flex">
         <input
@@ -37,7 +40,7 @@ function FormControl({
           onBlur={(e) => {
             verificationStatus ? null : handleBlur ? handleBlur(e) : null;
           }}
-          required
+          {...{ required: isRequired }}
         />
         {verificationNeeded && (
           <div
@@ -197,6 +200,7 @@ export default function KYC() {
                 formData={formData}
                 handleChange={handleChange}
                 handleBlur={handleBlur}
+                isRequired={false}
                 verificationNeeded={true}
                 handleVerify={(name) => {
                   handleVerify(name, verifiers.referralVerifier);
