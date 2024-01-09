@@ -29,13 +29,13 @@ export async function mailVerificationLink(email, link) {
 }
 
 export async function mailVerifier(email, curRowNumber) {
-  const link = `${process.env.HOSTNAME}/verify/email/${btoa(curRowNumber)}`;
+  const link = `${process.env.VERIFICATION_LINK}/email/${btoa(curRowNumber)}`;
   await mailVerificationLink(email, link);
   return true;
 }
 
 export async function collegeMailVerifier(email, curRowNumber) {
-  const link = `${process.env.HOSTNAME}/verify/college_email/${btoa(
+  const link = `${process.env.VERIFICATION_LINK}/college_email/${btoa(
     curRowNumber
   )}`;
   await mailVerificationLink(email, link);

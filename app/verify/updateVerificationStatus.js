@@ -17,7 +17,7 @@ async function initializeGoogleSheetsApi() {
 }
 
 export async function updater(rowNumber, updateWhat) {
-  decryptedRowNumber = atob(rowNumber);
+  const decryptedRowNumber = atob(rowNumber);
   const columnMapping = {
     email: "H",
     number: "I",
@@ -30,7 +30,7 @@ export async function updater(rowNumber, updateWhat) {
     range: `Sheet1!${columnMapping[updateWhat]}${decryptedRowNumber}:${columnMapping[updateWhat]}${decryptedRowNumber}`,
     valueInputOption: "USER_ENTERED",
     resource: {
-      values: ["YES"],
+      values: [["YES"]],
     },
   });
 }

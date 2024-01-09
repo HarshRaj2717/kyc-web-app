@@ -93,11 +93,13 @@ export default function KYC() {
   //   }
   // }
 
-  const handleSubmit = async () => {
-    await sheet.updateCurData(formData, curRowNumber);
-    await verifiers.whatsappVerifier(formData.number);
-    await verifiers.mailVerifier(formData.email);
-    await verifiers.collegeMailVerifier(formData.college_mail);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const data = formData;
+    await sheet.updateCurData(data, curRowNumber);
+    await verifiers.whatsappVerifier(data.number, curRowNumber);
+    await verifiers.mailVerifier(data.email, curRowNumber);
+    await verifiers.collegeMailVerifier(data.college_mail, curRowNumber);
   };
 
   const handleAutoSubmit = async (updatedData = null) => {
